@@ -15,10 +15,9 @@ for torrent in server.download_list():
     for tracker in server.t.multicall(torrent, "", "t.url="):
     
         tracker = str(tracker.pop())
-        pprint.pprint(tracker)
+#        pprint.pprint(tracker)
         
         if tracker not in processedTrackers:
-            print("Not in cache, checking ...")
             rgx1 = r"\/\/([a-zAZ0-9\.\-]*)[\:0-9]*"
             rgx2 = r"\:([0-9]{2,5})"
             rgx3 = r"^([a-z]*)\:"
@@ -39,45 +38,48 @@ for torrent in server.download_list():
                     port = 80
                 elif protocol == "https":
                     port = 443
-                    
+            print("Tracker with index %d protocol %s host %s port %s" % (trackerindex, protocol, host, port), end=" - ")
+            print("Not in cache, checking", end=" - ")
+
             if len(dnsq.query_dns(host, 'a')) > 0 :
-                pprint.pprint("resolvable")
                 ip = dnsq.query_dns(host, 'a').pop()
-                print("Tracker with index %d protocol %s host %s ip %s port %s" % (trackerindex, protocol, host, ip, port))
-                
+                print("resolvable, ip is "+ip, end=" - ")
+
                 if protocol == 'udp':
                 
                     res = os.system("nc -w 3 -vnzu "+ip+" "+str(port)+" > /dev/null 2>&1")
                     if res == 0:
                         status = True
-                        print("port alive")
+                        print("port alive", end=" - ")
                     else:
                         status = False
-                        print("port dead")
+                        print("port dead", end=" - ")
                 elif protocol == 'http':
 
                     res = os.system("nc -w 3 -vnz "+ip+" "+str(port)+" > /dev/null 2>&1")
                     if res == 0:
                         status = True
-                        print("port alive")
+                        print("port alive", end=" - ")
                     else:
                         status = False
-                        print("port dead")        
+                        print("port dead", end=" - ")        
                 elif protocol == 'https':
 
                     res = os.system("nc -w 3 -vnz "+ip+" "+str(port)+" > /dev/null 2>&1")
                     if res == 0:
                         status = True
-                        print("port alive")
+                        print("port alive", end=" - ")
                     else:
                         status = False
-                        print("port dead")      
+                        print("port dead", end=" - ")      
                 
             else:
-                pprint.pprint("not resolvable")
+                # print("Tracker with index %d protocol %s host %s port %s" % (trackerindex, protocol, host, port), end=" - ")
+
+                print("not resolvable", end=" - ")
                 status = False
         else:
-            print("result from cache")
+            print(tracker+" cached", end=" - ")
             status = processedTrackers[tracker]
 
         if status:
