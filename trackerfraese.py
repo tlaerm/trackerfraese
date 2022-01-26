@@ -8,6 +8,7 @@ import socket
 import struct
 
 server = ServerProxy("http://localhost:8000")
+processedTrackers = dict()
 
 def check_udp_tracker(host,port):
     clisocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -37,7 +38,6 @@ def check_http_port(host, port):
         a_socket.close()
 
 def process_torrent(torrent):
-    processedTrackers = dict()
     trackerindex = 0
     print("------------------------------------")
     print(server.d.name(torrent))
